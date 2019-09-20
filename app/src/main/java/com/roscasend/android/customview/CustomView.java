@@ -7,12 +7,26 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PointF;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
 public class CustomView extends View {
 
     private static final String TAG = CustomView.class.getName();
+
+    //create touch lock cases
+    private final int TOUCH_STATE_UNLOCKED = 0;
+    private final int TOUCH_STATE_LOCKED_TOP_LEFT = 1;
+    private final int TOUCH_STATE_LOCKED_TOP_RIGHT = 2;
+    private final int TOUCH_STATE_LOCKED_BOTTOM_LEFT = 3;
+    private final int TOUCH_STATE_LOCKED_BOTTOM_RIGHT = 4;
+    private final int TOUCH_STATE_LOCKED_MIDDLE_LEFT = 5;
+    private final int TOUCH_STATE_LOCKED_MIDDLE_BOTTOM = 6;
+    private final int TOUCH_STATE_LOCKED_MIDDLE_TOP = 7;
+    private final int TOUCH_STATE_LOCKED_MIDDLE_RIGHT = 8;
+
+    private int TOUCH_STATE = TOUCH_STATE_UNLOCKED;
 
     private Paint paint;
 
@@ -137,114 +151,157 @@ public class CustomView extends View {
     public boolean onTouchEvent(final MotionEvent event) {
 
         int action = event.getActionMasked();
+        float xCoordinate = 16;
+        float yCoordinate = 16;
+        int eventX = (int) event.getX();
+        int eventY = (int) event.getY();
 
-        if (event.getAction() == MotionEvent.ACTION_DOWN ||
-                event.getAction() == MotionEvent.ACTION_MOVE
-                || event.getAction() == MotionEvent.ACTION_UP) {
-
-            float xCoordinate = 16;
-            float yCoordinate = 16;
-
-            if (event.getX() < 16) {
-                xCoordinate = 16;
-            } else if (event.getX() > getWidth() - 16) {
-                xCoordinate = getWidth() - 16;
-            } else {
-                xCoordinate = event.getX();
-            }
-
-            if (event.getY() < 16) {
-                yCoordinate = 16;
-            } else if (event.getY() > getHeight() - 16) {
-                yCoordinate = getHeight() - 16;
-            } else {
-                yCoordinate = event.getY();
-            }
-            if (isInsideTopLeft(event.getX(), event.getY())) {
-                topLeftPoint.set(xCoordinate, yCoordinate);
-
-                middleTopPoint.set((topRightPoint.x + topLeftPoint.x) / 2,
-                        (topRightPoint.y + topLeftPoint.y) / 2);
-                middleLeftPoint.set((bottomLeftPoint.x + topLeftPoint.x) / 2,
-                        (bottomLeftPoint.y + topLeftPoint.y) / 2);
-                postInvalidate((int)xCoordinate, (int)yCoordinate, getWidth(), getHeight());
-                return true;
-            } else if (isInsideTopRight(event.getX(), event.getY())) {
-                topRightPoint.set(xCoordinate, yCoordinate);
-
-                middleTopPoint.set((topRightPoint.x + topLeftPoint.x) / 2,
-                        (topRightPoint.y + topLeftPoint.y) / 2);
-                middleRightPoint.set((bottomRightPoint.x + topRightPoint.x) / 2,
-                        (bottomRightPoint.y + topRightPoint.y) / 2);
-                invalidate();
-                return true;
-            } else if (isInsideBottomRight(event.getX(), event.getY())) {
-                bottomRightPoint.set(xCoordinate, yCoordinate);
-
-                middleBottomPoint.set((bottomLeftPoint.x + bottomRightPoint.x) / 2,
-                        (bottomLeftPoint.y + bottomRightPoint.y) / 2);
-                middleRightPoint.set((bottomRightPoint.x + topRightPoint.x) / 2,
-                        (bottomRightPoint.y + topRightPoint.y) / 2);
-                invalidate();
-                return true;
-            } else if (isInsideBottomLeft(event.getX(), event.getY())) {
-                bottomLeftPoint.set(xCoordinate, yCoordinate);
-
-                middleBottomPoint.set((bottomLeftPoint.x + bottomRightPoint.x) / 2,
-                        (bottomLeftPoint.y + bottomRightPoint.y) / 2);
-                middleLeftPoint.set((bottomLeftPoint.x + topLeftPoint.x) / 2,
-                        (bottomLeftPoint.y + topLeftPoint.y) / 2);
-                invalidate();
-                return true;
-            } else if (isInsideMidleTop(event.getX(), event.getY())) {
-
-                topLeftPoint.set(topLeftPoint.x, yCoordinate);
-                topRightPoint.set(topRightPoint.x, yCoordinate);
-
-                middleTopPoint.set((topRightPoint.x + topLeftPoint.x) / 2,
-                        (topRightPoint.y + topLeftPoint.y) / 2);
-                middleRightPoint.set((bottomRightPoint.x + topRightPoint.x) / 2,
-                        (bottomRightPoint.y + topRightPoint.y) / 2);
-                middleLeftPoint.set((bottomLeftPoint.x + topLeftPoint.x) / 2,
-                        (bottomLeftPoint.y + topLeftPoint.y) / 2);
-                return true;
-            } else if (isInsideMiddleBottom(event.getX(), event.getY())) {
-
-                bottomLeftPoint.set(bottomLeftPoint.x, yCoordinate);
-                bottomRightPoint.set(bottomRightPoint.x, yCoordinate);
-
-                middleBottomPoint.set((bottomLeftPoint.x + bottomRightPoint.x) / 2,
-                        (bottomLeftPoint.y + bottomRightPoint.y) / 2);
-                middleRightPoint.set((bottomRightPoint.x + topRightPoint.x) / 2,
-                        (bottomRightPoint.y + topRightPoint.y) / 2);
-                middleLeftPoint.set((bottomLeftPoint.x + topLeftPoint.x) / 2,
-                        (bottomLeftPoint.y + topLeftPoint.y) / 2);
-                invalidate();
-                return true;
-            }
+        if (eventX < 16) {
+            xCoordinate = 16;
+        } else if (eventX > getWidth() - 16) {
+            xCoordinate = getWidth() - 16;
+        } else {
+            xCoordinate = eventX;
         }
-//        else if (isInsideMidleRight(event.getX(), event.getY())) {
-//
-//            topRightPoint.set(xCoordinate, topRightPoint.y);
-//            bottomRightPoint.set(xCoordinate, topRightPoint.y);
-//
-//
-//
-//            invalidate();
-//            return true;
-//        } else if (isInsideMiddleLeft(event.getX(), event.getY())) {
-//
-//            topLeftPoint.set(bottomLeftPoint.x, yCoordinate);
-//            bottomLeftPoint.set(bottomRightPoint.x, yCoordinate);
-//
-//
-//
-//            invalidate();
-//
-//            return true;
-//        }
 
-        return super.onTouchEvent(event);
+        if (eventY < 16) {
+            yCoordinate = 16;
+        } else if (eventY > getHeight() - 16) {
+            yCoordinate = getHeight() - 16;
+        } else {
+            yCoordinate = eventY;
+        }
+
+        switch (event.getAction() & MotionEvent.ACTION_MASK) {
+        /* Touch event handling in brief,  read about touch event handling,
+
+        in ACTION_DOWN lock touch event for a particular point.
+
+
+         */
+            case MotionEvent.ACTION_DOWN:
+
+                // lock touch event for a point . subsequent touch events
+                if (isInsideTopLeft(event.getX(), event.getY())) {
+                    TOUCH_STATE = TOUCH_STATE_LOCKED_TOP_LEFT;
+                } else if (isInsideTopRight(event.getX(), event.getY())) {
+                    TOUCH_STATE = TOUCH_STATE_LOCKED_TOP_RIGHT;
+                } else if (isInsideBottomLeft(event.getX(), event.getY())) {
+                    TOUCH_STATE = TOUCH_STATE_LOCKED_BOTTOM_LEFT;
+                } else if (isInsideBottomRight(event.getX(), event.getY())) {
+                    TOUCH_STATE = TOUCH_STATE_LOCKED_BOTTOM_RIGHT;
+                } else if (isInsideMiddleLeft(event.getX(), event.getY())) {
+                    TOUCH_STATE = TOUCH_STATE_LOCKED_MIDDLE_LEFT;
+                } else if (isInsideMiddleBottom(event.getX(), event.getY())) {
+                    TOUCH_STATE = TOUCH_STATE_LOCKED_MIDDLE_BOTTOM;
+                } else if (isInsideMiddleTop(event.getX(), event.getY())) {
+                    TOUCH_STATE = TOUCH_STATE_LOCKED_MIDDLE_TOP;
+                } else if (isInsideMiddleRight(event.getX(), event.getY())) {
+                    TOUCH_STATE = TOUCH_STATE_LOCKED_MIDDLE_RIGHT;
+                }
+
+                Log.e(TAG, "onTouchEvent: TOUCH_STATE = " + TOUCH_STATE);
+                break;
+
+            case MotionEvent.ACTION_MOVE:
+                // simply check for locked case
+                if (TOUCH_STATE == TOUCH_STATE_LOCKED_TOP_LEFT) {
+                    Log.e(TAG, "onTouchEvent: top left locked");
+                    topLeftPoint.set(xCoordinate, yCoordinate);
+
+                    middleTopPoint.set((topRightPoint.x + topLeftPoint.x) / 2,
+                            (topRightPoint.y + topLeftPoint.y) / 2);
+                    middleLeftPoint.set((bottomLeftPoint.x + topLeftPoint.x) / 2,
+                            (bottomLeftPoint.y + topLeftPoint.y) / 2);
+                    // working fine with full invalidate also.
+                    invalidate();
+                } else  if (TOUCH_STATE == TOUCH_STATE_LOCKED_TOP_RIGHT) {
+                    Log.e(TAG, "onTouchEvent: top right locked");
+                    topRightPoint.set(xCoordinate, yCoordinate);
+
+                    middleTopPoint.set((topRightPoint.x + topLeftPoint.x) / 2,
+                            (topRightPoint.y + topLeftPoint.y) / 2);
+                    middleRightPoint.set((bottomRightPoint.x + topRightPoint.x) / 2,
+                            (bottomRightPoint.y + topRightPoint.y) / 2);
+                    // working fine with full invalidate also.
+                    invalidate();
+                } else  if (TOUCH_STATE == TOUCH_STATE_LOCKED_BOTTOM_LEFT) {
+                    Log.e(TAG, "onTouchEvent: top right locked");
+                    bottomLeftPoint.set(xCoordinate, yCoordinate);
+
+                    middleBottomPoint.set((bottomLeftPoint.x + bottomRightPoint.x) / 2,
+                            (bottomLeftPoint.y + bottomRightPoint.y) / 2);
+                    middleLeftPoint.set((bottomLeftPoint.x + topLeftPoint.x) / 2,
+                            (bottomLeftPoint.y + topLeftPoint.y) / 2);
+                    invalidate();
+                } else  if (TOUCH_STATE == TOUCH_STATE_LOCKED_BOTTOM_RIGHT) {
+                    Log.e(TAG, "onTouchEvent: top right locked");
+                    bottomRightPoint.set(xCoordinate, yCoordinate);
+
+                    middleBottomPoint.set((bottomLeftPoint.x + bottomRightPoint.x) / 2,
+                            (bottomLeftPoint.y + bottomRightPoint.y) / 2);
+                    middleRightPoint.set((bottomRightPoint.x + topRightPoint.x) / 2,
+                            (bottomRightPoint.y + topRightPoint.y) / 2);
+                    invalidate();
+                } else if (TOUCH_STATE == TOUCH_STATE_LOCKED_MIDDLE_BOTTOM) {
+                    Log.e(TAG, "onTouchEvent: top right locked");
+                    bottomLeftPoint.set(bottomLeftPoint.x, yCoordinate);
+                    bottomRightPoint.set(bottomRightPoint.x, yCoordinate);
+
+                    middleBottomPoint.set((bottomLeftPoint.x + bottomRightPoint.x) / 2,
+                            (bottomLeftPoint.y + bottomRightPoint.y) / 2);
+                    middleRightPoint.set((bottomRightPoint.x + topRightPoint.x) / 2,
+                            (bottomRightPoint.y + topRightPoint.y) / 2);
+                    middleLeftPoint.set((bottomLeftPoint.x + topLeftPoint.x) / 2,
+                            (bottomLeftPoint.y + topLeftPoint.y) / 2);
+                    invalidate();
+                } else if (TOUCH_STATE == TOUCH_STATE_LOCKED_MIDDLE_TOP) {
+                    Log.e(TAG, "onTouchEvent: top right locked");
+                    topLeftPoint.set(topLeftPoint.x, yCoordinate);
+                    topRightPoint.set(topRightPoint.x, yCoordinate);
+
+                    middleTopPoint.set((topRightPoint.x + topLeftPoint.x) / 2,
+                            (topRightPoint.y + topLeftPoint.y) / 2);
+                    middleRightPoint.set((bottomRightPoint.x + topRightPoint.x) / 2,
+                            (bottomRightPoint.y + topRightPoint.y) / 2);
+                    middleLeftPoint.set((bottomLeftPoint.x + topLeftPoint.x) / 2,
+                            (bottomLeftPoint.y + topLeftPoint.y) / 2);
+                    invalidate();
+                } else if (TOUCH_STATE == TOUCH_STATE_LOCKED_MIDDLE_LEFT) {
+                    Log.e(TAG, "onTouchEvent: top right locked");
+                    topLeftPoint.set(xCoordinate, topLeftPoint.y);
+                    bottomLeftPoint.set(xCoordinate, bottomLeftPoint.y);
+
+                    middleBottomPoint.set((bottomLeftPoint.x + bottomRightPoint.x) / 2,
+                            (bottomLeftPoint.y + bottomRightPoint.y) / 2);
+                    middleLeftPoint.set((bottomLeftPoint.x + topLeftPoint.x) / 2,
+                            (bottomLeftPoint.y + topLeftPoint.y) / 2);
+                    middleTopPoint.set((topRightPoint.x + topLeftPoint.x) / 2,
+                            (topRightPoint.y + topLeftPoint.y) / 2);
+
+                    invalidate();
+                } else if (TOUCH_STATE == TOUCH_STATE_LOCKED_MIDDLE_RIGHT) {
+                    Log.e(TAG, "onTouchEvent: top right locked");
+                    topRightPoint.set(xCoordinate, topRightPoint.y);
+                    bottomRightPoint.set(xCoordinate, bottomRightPoint.y);
+
+                    middleTopPoint.set((topRightPoint.x + topLeftPoint.x) / 2,
+                            (topRightPoint.y + topLeftPoint.y) / 2);
+                    middleBottomPoint.set((bottomLeftPoint.x + bottomRightPoint.x) / 2,
+                            (bottomLeftPoint.y + bottomRightPoint.y) / 2);
+                    middleRightPoint.set((bottomRightPoint.x + topRightPoint.x) / 2,
+                            (bottomRightPoint.y + topRightPoint.y) / 2);
+                    invalidate();
+                }
+                // handle other cases also
+                break;
+
+            case MotionEvent.ACTION_UP:
+                TOUCH_STATE = TOUCH_STATE_UNLOCKED;  // unlock
+
+        }
+
+        return true;
     }
 
     private double distance (PointF initialPoint, float finalPointX, float finalPointY) {
@@ -285,7 +342,7 @@ public class CustomView extends View {
         }
     }
 
-    private boolean isInsideMidleTop(float finalPointX, float finalPointY) {
+    private boolean isInsideMiddleTop(float finalPointX, float finalPointY) {
         if (distance(middleTopPoint, finalPointX, finalPointY) < 50) {
             return true;
         } else {
@@ -301,7 +358,7 @@ public class CustomView extends View {
         }
     }
 
-    private boolean isInsideMidleRight(float finalPointX, float finalPointY) {
+    private boolean isInsideMiddleRight(float finalPointX, float finalPointY) {
         if (distance(middleRightPoint, finalPointX, finalPointY) < 50) {
             return true;
         } else {
