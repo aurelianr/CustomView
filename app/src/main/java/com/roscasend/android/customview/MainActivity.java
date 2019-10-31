@@ -1,9 +1,9 @@
 package com.roscasend.android.customview;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.os.Bundle;
 import android.view.View;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     CustomView customView;
@@ -12,9 +12,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        customView = findViewById(R.id.customView);
 
-        findViewById(R.id.maximize).setOnClickListener(this);
+        MyRadioButton customView = findViewById(R.id.radioButton2);
+//        customView.setImageResource(R.drawable.american);
+        customView.setImageResource(R.drawable.american);
+
+//
+//        findViewById(R.id.maximize).setOnClickListener(this);
     }
 
     @Override

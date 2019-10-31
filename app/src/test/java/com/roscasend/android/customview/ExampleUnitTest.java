@@ -1,6 +1,10 @@
 package com.roscasend.android.customview;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.junit.Test;
+
+import java.util.logging.Logger;
 
 import static org.junit.Assert.*;
 
@@ -9,9 +13,25 @@ import static org.junit.Assert.*;
  *
  * @see <a href="http://d.android.com/tools/testing">Testing documentation</a>
  */
+
 public class ExampleUnitTest {
     @Test
     public void addition_isCorrect() {
-        assertEquals(4, 2 + 2);
+
+        final JSONObject jsonBody = new JSONObject();
+        try {
+            jsonBody.put("componentId", "111");
+        } catch (JSONException e) {
+            fail(e.getMessage());
+        }
+
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("############ ");
+        stringBuilder.append(jsonBody.toString());
+        String out = "############ " + 111;
+
+        assertEquals("############ " + 111, jsonBody.toString());
     }
+
+
 }
