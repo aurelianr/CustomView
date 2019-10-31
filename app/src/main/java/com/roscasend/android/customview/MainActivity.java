@@ -13,9 +13,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
 
 
-        MyRadioButton customView = findViewById(R.id.radioButton2);
-//        customView.setImageResource(R.drawable.american);
-        customView.setImageResource(R.drawable.american);
+        MyRadioButton radioButton1 = findViewById(R.id.radioButton1);
+        radioButton1.setImageResource(R.drawable.american);
+
+        MyRadioButton radioButton2 = findViewById(R.id.radioButton2);
+        radioButton2.setImageResource(R.drawable.mastercard);
+
+        MyRadioButton radioButton3 = findViewById(R.id.radioButton);
+        radioButton3.setImageResource(R.drawable.prepaid);
 
 //
 //        findViewById(R.id.maximize).setOnClickListener(this);

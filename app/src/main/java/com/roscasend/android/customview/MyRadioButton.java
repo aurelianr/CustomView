@@ -9,6 +9,9 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.AppCompatRadioButton;
+
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.MultiTransformation;
@@ -18,8 +21,7 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.Target;
 
-import androidx.annotation.Nullable;
-import androidx.appcompat.widget.AppCompatRadioButton;
+import jp.wasabeef.glide.transformations.MaskTransformation;
 import jp.wasabeef.glide.transformations.RoundedCornersTransformation;
 
 // TODO: If you are using androidx
@@ -88,7 +90,12 @@ public class MyRadioButton extends AppCompatRadioButton {
                 .apply(RequestOptions.bitmapTransform(
                         new MultiTransformation<>(
                                 new CenterCrop(),
-                                new RoundedCornersTransformation(24, 0, RoundedCornersTransformation.CornerType.ALL))
+                                new RoundedCornersTransformation(
+                                        dp2px(getContext(), 24),
+                                        0,
+                                        RoundedCornersTransformation.CornerType.ALL
+                                )
+                        )
                         )
                 )
                 .listener(requestListener)
@@ -99,15 +106,26 @@ public class MyRadioButton extends AppCompatRadioButton {
         Glide.with(getContext())
                 .asBitmap()
                 .load(bitmap)
+                .apply(RequestOptions.overrideOf(imageView.getWidth(), imageView.getHeight()))
                 .apply(RequestOptions.bitmapTransform(
                         new MultiTransformation<>(
                                 new CenterCrop(),
-                                new RoundedCornersTransformation(24, 0, RoundedCornersTransformation.CornerType.ALL))
+                                new RoundedCornersTransformation(
+                                        dp2px(getContext(), 24),
+                                        0,
+                                        RoundedCornersTransformation.CornerType.ALL
+                                )
+                        )
                         )
                 )
                 .listener(requestListener)
                 .submit();
     }
+
+    private int dp2px(Context context, int dp) {
+        return (int) (dp * context.getResources().getDisplayMetrics().density);
+    }
+
     // setText is a final method in ancestor, so we must take another name.
     public void setTextWith(int resId) {
         textView.setText(resId);
