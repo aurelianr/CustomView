@@ -9,14 +9,6 @@ import android.util.AttributeSet;
 
 import androidx.appcompat.widget.AppCompatImageView;
 
-/**
- * Copyright (c) 1999-2016 Star-Storage. All rights reserved.
- * <p>
- * This software is the confidential and proprietary information of Star Storage.
- * You shall not disclose such Confidential Information and shall use it only in
- * accordance with the terms of the license agreement you entered into with Star-Storage.
- */
-
 public class RoundedImageView extends AppCompatImageView {
     private Paint paint;
     public RoundedImageView(Context context) {
